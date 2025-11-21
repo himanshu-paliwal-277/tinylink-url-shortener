@@ -24,17 +24,20 @@ Backend server for TinyLink URL Shortener built with Node.js, Express, and Mongo
 ## Setup
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Configure environment variables**:
    Create a `.env` file based on `.env.example`:
+
    ```bash
    cp .env.example .env
    ```
 
    Update the values:
+
    ```env
    PORT=4000
    NODE_ENV=development
@@ -42,6 +45,7 @@ Backend server for TinyLink URL Shortener built with Node.js, Express, and Mongo
    ```
 
 3. **Start the server**:
+
    ```bash
    npm start
    ```
@@ -53,9 +57,11 @@ Backend server for TinyLink URL Shortener built with Node.js, Express, and Mongo
 ### Health Check
 
 #### GET /healthz
+
 Check if the server is running.
 
 **Response** (200):
+
 ```json
 {
   "ok": true,
@@ -69,17 +75,20 @@ Check if the server is running.
 ### Links Management
 
 #### POST /api/v1/links
+
 Create a new short link.
 
 **Request Body**:
+
 ```json
 {
   "targetUrl": "https://example.com/very/long/url",
-  "code": "abc123"  // Optional: 6-8 alphanumeric characters
+  "code": "abc123" // Optional: 6-8 alphanumeric characters
 }
 ```
 
 **Response** (201):
+
 ```json
 {
   "message": "Link created successfully",
@@ -96,6 +105,7 @@ Create a new short link.
 ```
 
 **Error Response** (409) - Code already exists:
+
 ```json
 {
   "error": "Short code already exists"
@@ -103,6 +113,7 @@ Create a new short link.
 ```
 
 **Error Response** (400) - Invalid URL or code:
+
 ```json
 {
   "error": "Validation failed",
@@ -116,9 +127,11 @@ Create a new short link.
 ```
 
 #### GET /api/v1/links
+
 Get all links.
 
 **Response** (200):
+
 ```json
 {
   "data": [
@@ -136,9 +149,11 @@ Get all links.
 ```
 
 #### GET /api/v1/links/:code
+
 Get statistics for a specific link.
 
 **Response** (200):
+
 ```json
 {
   "data": {
@@ -154,6 +169,7 @@ Get statistics for a specific link.
 ```
 
 **Error Response** (404):
+
 ```json
 {
   "error": "Link not found"
@@ -161,9 +177,11 @@ Get statistics for a specific link.
 ```
 
 #### DELETE /api/v1/links/:code
+
 Delete a link.
 
 **Response** (200):
+
 ```json
 {
   "message": "Link deleted successfully",
@@ -175,6 +193,7 @@ Delete a link.
 ```
 
 **Error Response** (404):
+
 ```json
 {
   "error": "Link not found"
@@ -184,12 +203,14 @@ Delete a link.
 ### Redirect
 
 #### GET /:code
+
 Redirect to the original URL and track click.
 
 **Response** (302):
 Redirects to the target URL.
 
 **Error Response** (404):
+
 ```json
 {
   "error": "Link not found"
@@ -199,11 +220,13 @@ Redirects to the target URL.
 ## Validation Rules
 
 ### Short Code
+
 - Must be 6-8 alphanumeric characters (A-Z, a-z, 0-9)
 - Globally unique across all users
 - Auto-generated if not provided
 
 ### Target URL
+
 - Must be a valid HTTP or HTTPS URL
 - Cannot be empty
 
@@ -262,6 +285,7 @@ All endpoints return consistent error responses:
 ```
 
 Common HTTP status codes:
+
 - `200` - Success
 - `201` - Created
 - `302` - Redirect
@@ -273,6 +297,7 @@ Common HTTP status codes:
 ## CORS Configuration
 
 By default, the API accepts requests from:
+
 - `http://localhost:3000` (frontend dev server)
 
 Update `allowedOrigins` in [server.js](src/server.js#L15) to add more origins.

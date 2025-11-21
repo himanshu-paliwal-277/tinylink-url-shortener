@@ -7,10 +7,7 @@ import {
   getSingleLinkController,
 } from '../../controllers/linkController.js';
 import { validateBody, validateParams } from '../../middleware/validateRequest.js';
-import {
-  createLinkSchema,
-  linkCodeParamSchema,
-} from '../../validation/linkValidation.js';
+import { createLinkSchema, linkCodeParamSchema } from '../../validation/linkValidation.js';
 
 const router = express.Router();
 
@@ -21,17 +18,9 @@ router.post('/links', validateBody(createLinkSchema), createLinkController);
 router.get('/links', getAllLinksController);
 
 // GET /api/links/:code - Get single link stats
-router.get(
-  '/links/:code',
-  validateParams(linkCodeParamSchema),
-  getSingleLinkController
-);
+router.get('/links/:code', validateParams(linkCodeParamSchema), getSingleLinkController);
 
 // DELETE /api/links/:code - Delete link
-router.delete(
-  '/links/:code',
-  validateParams(linkCodeParamSchema),
-  deleteLinkController
-);
+router.delete('/links/:code', validateParams(linkCodeParamSchema), deleteLinkController);
 
 export default router;
