@@ -1,11 +1,35 @@
+import cors from 'cors';
 import express from 'express';
+
+import connectDB from './config/dbConfig.js';
+import { PORT } from './config/serverConfig.js';
+import apiRouter from './routes/apiRouter.js';
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Hello, TinyLink URL Shortener Backend!');
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.listen(4000, () => {
-  console.log('Server is running on port 4000' + '\nVisit http://localhost:4000' );
+const allowedOrigins = [
+  'http://localhost:3000',
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
+app.use('/api', apiRouter);
+
+app.listen(PORT, async () => {
+  console.log(`🚀 Server is up and running at: http://localhost:${PORT}`);
+  connectDB();
 });
