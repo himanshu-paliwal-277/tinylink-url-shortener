@@ -1,4 +1,5 @@
 import linkRepository from '../repository/linkRepository.js';
+import Link from '../schema/link.js';
 import generateCode from '../utils/generateCode.js';
 import validateUrl from '../utils/validateUrl.js';
 
@@ -23,17 +24,31 @@ export const createLinkService = async (data) => {
       error.status = 400;
       throw error;
     }
-  } else {
-    // Auto-generate 6–8 char alphanumeric code
-    shortCode = generateCode();
-  }
 
-  // Check if code already exists
-  const existing = await linkRepository.getAll();
-  if (existing.find((x) => x.code === shortCode)) {
-    const error = new Error('Short code already exists');
-    error.status = 409;
-    throw error;
+    // Check if custom code already exists
+    const existing = await Link.findOne({ code: shortCode });
+    if (existing) {
+      const error = new Error('Short code already exists');
+      error.status = 409;
+      throw error;
+    }
+  } else {
+    // Auto-generate 6 char alphanumeric code and ensure uniqueness
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    while (attempts < maxAttempts) {
+      shortCode = generateCode(6);
+      const existing = await Link.findOne({ code: shortCode });
+      if (!existing) break;
+      attempts++;
+    }
+
+    if (attempts === maxAttempts) {
+      const error = new Error('Could not generate unique code');
+      error.status = 500;
+      throw error;
+    }
   }
 
   // Create new link
@@ -42,7 +57,6 @@ export const createLinkService = async (data) => {
     targetUrl,
     totalClicks: 0,
     lastClicked: null,
-    deleted: false,
   });
 
   return newLink;
@@ -51,17 +65,14 @@ export const createLinkService = async (data) => {
 // ------------------- GET ALL LINKS -------------------
 export const getAllLinksService = async () => {
   const links = await linkRepository.getAll();
-
-  // Filter out deleted links
-  return links.filter((l) => !l.deleted);
+  return links;
 };
 
 // ------------------- GET SINGLE LINK -------------------
 export const getSingleLinkService = async (code) => {
-  const allLinks = await linkRepository.getAll();
-  const link = allLinks.find((x) => x.code === code);
+  const link = await Link.findOne({ code });
 
-  if (!link || link.deleted) {
+  if (!link) {
     const error = new Error('Link not found');
     error.status = 404;
     throw error;
@@ -72,8 +83,7 @@ export const getSingleLinkService = async (code) => {
 
 // ------------------- DELETE LINK -------------------
 export const deleteLinkService = async (code) => {
-  const allLinks = await linkRepository.getAll();
-  const link = allLinks.find((x) => x.code === code);
+  const link = await Link.findOne({ code });
 
   if (!link) {
     const error = new Error('Link not found');
@@ -81,28 +91,31 @@ export const deleteLinkService = async (code) => {
     throw error;
   }
 
-  // Soft delete: mark deleted = true
-  const updated = await linkRepository.update(link._id, { deleted: true });
+  // Hard delete from database
+  await Link.findByIdAndDelete(link._id);
 
-  return updated;
+  return { message: 'Link deleted successfully', code };
 };
 
 // ------------------- UPDATE CLICKS (Redirect) -------------------
 export const updateClicksService = async (code) => {
-  const allLinks = await linkRepository.getAll();
-  const link = allLinks.find((x) => x.code === code);
+  const link = await Link.findOne({ code });
 
-  if (!link || link.deleted) {
+  if (!link) {
     const error = new Error('Link not found');
     error.status = 404;
     throw error;
   }
 
-  // Increment clicks atomically
-  const updated = await linkRepository.update(link._id, {
-    totalClicks: link.totalClicks + 1,
-    lastClicked: new Date(),
-  });
+  // Increment clicks atomically using findOneAndUpdate
+  const updated = await Link.findOneAndUpdate(
+    { code },
+    {
+      $inc: { totalClicks: 1 },
+      $set: { lastClicked: new Date() },
+    },
+    { new: true }
+  );
 
   return updated;
 };

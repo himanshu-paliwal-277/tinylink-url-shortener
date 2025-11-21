@@ -3,6 +3,8 @@ import express from 'express';
 
 import connectDB from './config/dbConfig.js';
 import { PORT } from './config/serverConfig.js';
+import { healthCheckController } from './controllers/healthController.js';
+import { redirectController } from './controllers/redirectController.js';
 import apiRouter from './routes/apiRouter.js';
 
 const app = express();
@@ -10,9 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = [
-  'http://localhost:3000',
-];
+const allowedOrigins = ['http://localhost:3000'];
 
 app.use(
   cors({
@@ -27,7 +27,14 @@ app.use(
   })
 );
 
+// Health check endpoint - /healthz
+app.get('/healthz', healthCheckController);
+
+// API routes - /api/*
 app.use('/api', apiRouter);
+
+// Redirect route - /:code (must be last to not override other routes)
+app.get('/:code', redirectController);
 
 app.listen(PORT, async () => {
   console.log(`🚀 Server is up and running at: http://localhost:${PORT}`);

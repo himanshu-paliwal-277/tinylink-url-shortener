@@ -1,5 +1,5 @@
-import Link from '../schema/Link';
-import crudRepository from './crudRepository';
+import Link from '../schema/link.js';
+import crudRepository from './crudRepository.js';
 
 const linkRepository = {
   ...crudRepository(Link),
