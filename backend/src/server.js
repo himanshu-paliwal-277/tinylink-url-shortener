@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allowedOrigins = ['http://localhost:3000'];
+const allowedOrigins = ['http://localhost:3000', 'https://tinylink-url-shortener.netlify.app/'];
 
 app.use(
   cors({
@@ -29,6 +29,10 @@ app.use(
 
 // Health check endpoint - /healthz
 app.get('/healthz', healthCheckController);
+
+app.get('/', (req, res) => {
+  return res.status(200).json({ message: 'Welcome to TinyLink URL Shortener Backend!' });
+});
 
 // API routes - /api/*
 app.use('/api', apiRouter);

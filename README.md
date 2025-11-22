@@ -4,8 +4,8 @@ A modern, full-stack URL shortener application with click tracking and analytics
 
 ## 🚀 Live Demo
 
-- **Frontend**: [Your Vercel URL]
-- **Backend**: [Your Render/Railway URL]
+- **Frontend**: [[Live Demo](https://tinylink-url-shortener.netlify.app/)]
+- **Backend**: [[Backend](https://tinylink-url-shortener-yptw.onrender.com)]
 
 ## 📸 Screenshots
 
