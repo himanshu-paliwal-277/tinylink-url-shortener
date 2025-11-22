@@ -1,9 +1,9 @@
 'use client';
 
 import { format } from 'date-fns';
-import { ArrowLeft, Copy, ExternalLink, Link2, RefreshCw, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Check, Copy, ExternalLink, Link2, TrendingUp } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -17,12 +17,15 @@ const StatsPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const code = params.code as string;
+  const [copiedItem, setCopiedItem] = useState<string | null>(null);
 
-  const { link, isLoading, isError, error, refetch } = useFetchSingleLink(code);
+  const { link, isLoading, isError, error } = useFetchSingleLink(code);
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = async (text: string, itemId: string) => {
+    await navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard!');
+    setCopiedItem(itemId);
+    setTimeout(() => setCopiedItem(null), 2000);
   };
 
   const getShortUrl = () => {
@@ -146,9 +149,9 @@ const StatsPage: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>Link Details</CardTitle>
-              <Button variant="outline" size="icon" onClick={() => refetch()}>
+              {/* <Button variant="outline" size="icon" onClick={() => refetch()}>
                 <RefreshCw className="h-4 w-4" />
-              </Button>
+              </Button> */}
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -162,8 +165,16 @@ const StatsPage: React.FC = () => {
                 <code className="flex-1 rounded bg-muted px-4 py-3 text-lg font-mono">
                   {link.code}
                 </code>
-                <Button variant="outline" size="sm" onClick={() => copyToClipboard(link.code)}>
-                  <Copy className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(link.code, 'code')}
+                >
+                  {copiedItem === 'code' ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -178,8 +189,16 @@ const StatsPage: React.FC = () => {
                 <div className="flex-1 rounded bg-muted px-4 py-3 text-base break-all">
                   {getShortUrl()}
                 </div>
-                <Button variant="outline" size="sm" onClick={() => copyToClipboard(getShortUrl())}>
-                  <Copy className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(getShortUrl(), 'shortUrl')}
+                >
+                  {copiedItem === 'shortUrl' ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -199,8 +218,16 @@ const StatsPage: React.FC = () => {
                     <ExternalLink className="h-4 w-4" />
                   </Button>
                 </a>
-                <Button variant="outline" size="sm" onClick={() => copyToClipboard(link.targetUrl)}>
-                  <Copy className="h-4 w-4" />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(link.targetUrl, 'targetUrl')}
+                >
+                  {copiedItem === 'targetUrl' ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>

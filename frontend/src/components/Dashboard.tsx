@@ -97,7 +97,7 @@ const Dashboard: React.FC = () => {
     <div className="mx-auto py-8 px-4 max-w-7xl">
       <div className="flex flex-col gap-8">
         {/* Header */}
-        <div className="mb-6">
+        <div className="">
           <h1 className="sm:text-4xl text-3xl font-bold  text-sky-500">URL Shortener</h1>
 
           <p className="text-muted-foreground mt-1 text-base">

@@ -1,8 +1,9 @@
 'use client';
 
 import { formatDistanceToNow } from 'date-fns';
-import { Copy, ExternalLink, Trash2 } from 'lucide-react';
+import { Check, Copy, ExternalLink, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import type { Link as LinkType } from '@/types/link';
@@ -22,9 +23,13 @@ interface LinksTableProps {
 
 export function LinksTable({ links, isLoading, onDelete }: LinksTableProps) {
   const router = useRouter();
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyToClipboard = async (text: string, id: string) => {
+    await navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard!');
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const getShortUrl = (code: string) => {
@@ -112,10 +117,14 @@ export function LinksTable({ links, isLoading, onDelete }: LinksTableProps) {
                     className="h-8 w-8 p-0 cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      copyToClipboard(getShortUrl(link.code));
+                      copyToClipboard(getShortUrl(link.code), link._id);
                     }}
                   >
-                    <Copy className="h-4 w-4" />
+                    {copiedId === link._id ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </TableCell>
