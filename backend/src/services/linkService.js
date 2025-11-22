@@ -63,9 +63,9 @@ export const createLinkService = async (data) => {
 };
 
 // ------------------- GET ALL LINKS -------------------
-export const getAllLinksService = async () => {
-  const links = await linkRepository.getAll();
-  return links;
+export const getAllLinksService = async ({ page = 1, limit = 10, search = '' }) => {
+  const result = await linkRepository.getAllPaginated({ page, limit, search });
+  return result;
 };
 
 // ------------------- GET SINGLE LINK -------------------

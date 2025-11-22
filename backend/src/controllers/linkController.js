@@ -42,10 +42,12 @@ export const deleteLinkController = async (req, res) => {
 // GET /api/links
 export const getAllLinksController = async (req, res) => {
   try {
-    const links = await getAllLinksService();
-    return res.status(200).json({
-      data: links,
-    });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || '';
+
+    const result = await getAllLinksService({ page, limit, search });
+    return res.status(200).json(result);
   } catch (error) {
     return res.status(error.status || 500).json({
       error: error.message || 'Something went wrong',

@@ -1,9 +1,10 @@
 import express from 'express';
 
-import v1Router from './v1/v1Router.js';
+import linkRoutes from './linkRoutes.js';
 
 const router = express.Router();
 
-router.use('/v1', v1Router);
+// Mount link routes directly under /api
+router.use('/links', linkRoutes);
 
 export default router;

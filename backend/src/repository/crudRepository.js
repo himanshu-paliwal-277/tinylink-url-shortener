@@ -8,6 +8,35 @@ export default function crudRepository(model) {
       const allDocs = await model.find();
       return allDocs;
     },
+    getAllPaginated: async function ({ page = 1, limit = 10, search = '' }) {
+      const skip = (page - 1) * limit;
+
+      // Build search query
+      const searchQuery = search
+        ? {
+            $or: [
+              { code: { $regex: search, $options: 'i' } },
+              { targetUrl: { $regex: search, $options: 'i' } },
+            ],
+          }
+        : {};
+
+      // Get total count and paginated results
+      const [total, docs] = await Promise.all([
+        model.countDocuments(searchQuery),
+        model.find(searchQuery).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      ]);
+
+      return {
+        data: docs,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    },
     getById: async function (id) {
       const doc = await model.findById(id);
       return doc;
