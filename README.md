@@ -9,7 +9,9 @@ A modern, full-stack URL shortener application with click tracking and analytics
 
 ## 📸 Screenshots
 
-[Add screenshots of your application here]
+![Dashboard Screenshot](./frontend/public/screenshots/screenshot_1.png)
+
+![Link Details Screenshot](./frontend/public/screenshots/screenshot_2.png)
 
 ## ✨ Features
 
